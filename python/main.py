@@ -14,13 +14,12 @@ logger.level = logging.DEBUG
 images = pathlib.Path(__file__).parent.resolve() / "images"
 origins = [os.environ.get("FRONT_URL", "http://localhost:3000")]
 app.add_middleware(
-    CORSMiddleware,
+       CORSMiddleware,
     allow_origins=origins,
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-
 
 @app.get("/")
 def root():
@@ -61,12 +60,9 @@ def get_item_id(item_id: int):
 async def get_image(image_name):
     # Create image path
     image = images / image_name
-
     if not image_name.endswith(".jpg"):
         raise HTTPException(status_code=400, detail="Image path does not end with .jpg")
-
     if not image.exists():
         logger.debug(f"Image not found: {image}")
         image = images / "default.jpg"
-
     return FileResponse(image)
