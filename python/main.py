@@ -88,6 +88,7 @@ def search_items(keyword: str = Query(...)):
     
     return {"items": filtered_items}
 
+
 @app.get("/image/{image_name}")
 async def get_image(image_name):
     # Create image path
