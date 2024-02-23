@@ -4,7 +4,8 @@ import pathlib
 import json
 import hashlib
 import shutil
-from fastapi import FastAPI, Form, HTTPException, UploadFile, File
+import sqlite3
+from fastapi import FastAPI, Form, HTTPException, UploadFile, File, Query
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -34,27 +35,59 @@ def add_item(name: str = Form(...), category: str = Form(...), image: UploadFile
     with open(image_path, "wb") as image_file:
         image_file.write(image_content)
     logger.info(f"Receive item: {name} {category} {image_hash}")
-    new_item = {"name": name, "category": category, "image_name":image_hash}
-    with open('items.json', 'r') as file:
-        items_data = json.load(file)
-    items_data["items"].append(new_item)
-    with open('items.json', 'w') as file:
-        json.dump(items_data, file)
+
+    conn = sqlite3.connect('mercari.sqlite3')
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM categories WHERE name = ?', (category,))
+    existing_category = cursor.fetchone()
+    if existing_category:
+        category_id = existing_category[0]
+    else:
+        cursor.execute('INSERT INTO categories (name) VALUES (?)', (category,))
+        conn.commit()
+        category_id = cursor.lastrowid
+    cursor.execute('INSERT INTO items (name, category_id, image_name) VALUES (?, ?, ?)', (name, category_id, image_hash))
+    conn.commit()
+    conn.close()
     return {"message": f"item received: {name}"}
 
 @app.get("/items")
 def get_items():
-    with open('items.json', 'r') as file:
-        items_data = json.load(file)
-    return items_data
+    conn = sqlite3.connect('mercari.sqlite3')
+    cursor = conn.cursor()
+    cursor.execute('SELECT name, category_id, image_name FROM items')
+    items_data = [{"name": name, "category": get_category_name(category_id), "image_name": image_name} for name, category_id, image_name in cursor.fetchall()]
+    conn.close()
+    return {"items": items_data}
+
+def get_category_name(category_id):
+    conn = sqlite3.connect('mercari.sqlite3')
+    cursor = conn.cursor()
+    cursor.execute('SELECT name FROM categories WHERE id = ?', (category_id,))
+    category_name = cursor.fetchone()[0]
+    conn.close()
+    return category_name
 
 @app.get("/items/{item_id}")
 def get_item_id(item_id: int):
-    with open('items.json', 'r') as file:
-        items_data = json.load(file)
-        items_list = items_data["items"]
-        item = items_list[item_id]
-        return item
+    conn = sqlite3.connect('mercari.sqlite3')
+    cursor = conn.cursor()
+    cursor.execute('SELECT name, category_id, image_name FROM items WHERE id = ?', (item_id,))
+    item_data = cursor.fetchone()
+    name, category_id, image_name = item_data
+    category_name = get_category_name(category_id)
+    item = {"name": name, "category": category_name, "image_name": image_name}
+    return item
+    
+@app.get("/search")
+def search_items(keyword: str = Query(...)):
+    conn = sqlite3.connect('mercari.sqlite3')
+    cursor = conn.cursor()
+    cursor.execute('SELECT items.name, categories.name FROM items INNER JOIN categories ON items.category_id = categories.id WHERE items.name LIKE ?', ('%' + keyword + '%',))
+    filtered_items = [{"name": name, "category": category} for name, category in cursor.fetchall()]
+    
+    return {"items": filtered_items}
+
 
 @app.get("/image/{image_name}")
 async def get_image(image_name):
