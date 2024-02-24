@@ -99,3 +99,4 @@ async def get_image(image_name):
         logger.debug(f"Image not found: {image}")
         image = images / "default.jpg"
     return FileResponse(image)
+    
