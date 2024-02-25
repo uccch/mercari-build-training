@@ -25,14 +25,19 @@
 }
 
 .ItemList {
-  background-color: #222427;
+  background-color: white;
   min-height: 8vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: left;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
   font-size: calc(10px + 1vmin);
-  color: white;
+  color: #222427;
+}
+
+.Item {
+  width: 200px;
+  margin-right: 20px;
 }
 
 .App-link {
