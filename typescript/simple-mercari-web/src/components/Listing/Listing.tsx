@@ -51,16 +51,25 @@ export const Listing: React.FC<Prop> = (props) => {
         console.error('POST error:', error);
       })
   };
+
   return (
     <div className='Listing'>
       <form onSubmit={onSubmit}>
-        <div>
-          <input type='text' name='name' id='name' placeholder='name' onChange={onValueChange} required />
-          <input type='text' name='category' id='category' placeholder='category' onChange={onValueChange} />
-          <input type='file' name='image' id='image' onChange={onFileChange} required />
-          <button type='submit'>List this item</button>
+        <div style={{ textAlign: 'center' }}>
+          <p>
+            <input type='text' name='name' id='name' placeholder='name' onChange={onValueChange} required />
+            <br />
+            <input type='text' name='category' id='category' placeholder='category' onChange={onValueChange} />
+            <br />
+              <input type='file' name='image' id='image' onChange={onFileChange} required />
+            <br />
+            <button type='submit'>List this item</button>
+          </p>
         </div>
       </form>
     </div>
   );
+  
+  
+
 }

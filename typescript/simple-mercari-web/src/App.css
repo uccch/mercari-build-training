@@ -18,8 +18,8 @@
   min-height: 8vh;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: left;
   font-size: calc(10px + 1vmin);
   color: white;
 }
@@ -27,17 +27,22 @@
 .ItemList {
   background-color: white;
   min-height: 8vh;
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   font-size: calc(10px + 1vmin);
   color: #222427;
 }
 
 .Item {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-items: center;
+  justify-items: center;
+}
+
+.Item img {
   width: 200px;
-  margin-right: 20px;
+  height: 200px;
 }
 
 .App-link {
