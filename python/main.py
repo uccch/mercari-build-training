@@ -5,6 +5,7 @@ import json
 import hashlib
 import shutil
 import sqlite3
+from pathlib import Path
 from fastapi import FastAPI, Form, HTTPException, UploadFile, File, Query
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -90,12 +91,13 @@ def search_items(keyword: str = Query(...)):
 
 @app.get("/image/{image_name}")
 async def get_image(image_name):
-    # Create image path
-    image = images / image_name
+    images_dir = "/mercari-build-training/python/images"
+    image_path = Path(images_dir) / image_name
     if not image_name.endswith(".jpg"):
         raise HTTPException(status_code=400, detail="Image path does not end with .jpg")
-    if not image.exists():
-        logger.debug(f"Image not found: {image}")
-        image = images / "default.jpg"
-    return FileResponse(image)
+    if not image_path.exists():
+        logger.debug(f"Image not found: {image_path}")
+        image_path = Path(images_dir) / "default.jpg"
+    return FileResponse(image_path)
+
     
