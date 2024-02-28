@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState} from 'react';
 
 interface Item {
   id: number;
@@ -46,20 +46,23 @@ export const ItemList: React.FC<Prop> = (props) => {
   }, [reload]);
 
   return (
-    <div>
-      {items.map((item) => {
+    <div className='ItemList'>
+      {items.map((item, index) => {
         return (
-          <div key={item.id} className='ItemList'>
-            {/* TODO: Task 1: Replace the placeholder image with the item image */}
-            <img src={placeholderImage} />
-            <p>
-              <span>Name: {item.name}</span>
+        
+          <div key={item.id} className='Item'>
+            <br />
+            <img src={`http://localhost:9000/image/${item.image_name}`} alt={item.name} />
+            <p style={{ textAlign: 'center' }}>
+              <span>item: {item.name}</span>
               <br />
-              <span>Category: {item.category}</span>
+              <span>category: {item.category}</span>
             </p>
           </div>
         )
       })}
     </div>
   )
+  
+  
 };
