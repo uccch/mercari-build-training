@@ -84,8 +84,8 @@ def get_item_id(item_id: int):
 def search_items(keyword: str = Query(...)):
     conn = sqlite3.connect('mercari.sqlite3')
     cursor = conn.cursor()
-    cursor.execute('SELECT items.name, categories.name FROM items INNER JOIN categories ON items.category_id = categories.id WHERE items.name LIKE ?', ('%' + keyword + '%',))
-    filtered_items = [{"name": name, "category": category} for name, category in cursor.fetchall()]
+    cursor.execute('SELECT items.name, categories.name, items.image_name FROM items INNER JOIN categories ON items.category_id = categories.id WHERE items.name LIKE ?', ('%' + keyword + '%',))
+    filtered_items = [{"name": name, "category": category, "image_name": image_name} for name, category, image_name in cursor.fetchall()]
     
     return {"items": filtered_items}
 
